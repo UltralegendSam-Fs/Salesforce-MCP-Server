@@ -505,8 +505,6 @@ MIT License - See [LICENSE](LICENSE) for details
 
 If this project saved you time, please star the repository! ⭐
 
-[![Star History Chart](https://api.star-history.com/svg?repos=UltralegendSam-Fs/Salesforce-MCP-Server&type=Date)](https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server&Date)
-
 ---
 
 **Made with ❤️ by Sameer** | Powered by [Anthropic Claude](https://claude.ai)
