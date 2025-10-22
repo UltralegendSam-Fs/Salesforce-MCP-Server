@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Created by Sameer** | [Report Issues](https://github.com/AethereusSF/Salesforce-MCP-Server/issues) | [Complete Guide](COMPLETE_GUIDE.md)
+**Created by Sameer** | [Report Issues](https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server/issues) | [Complete Guide](COMPLETE_GUIDE.md)
 
 ---
 
@@ -43,7 +43,7 @@ Transform Claude Desktop into a **powerful Salesforce IDE** with 97+ tools for m
 
 ```bash
 # Clone repository
-git clone https://github.com/AethereusSF/Salesforce-MCP-Server
+git clone https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server
 cd Salesforce-MCP-Server
 
 # Create virtual environment
@@ -61,7 +61,7 @@ python -m app.main --mcp-stdio
 
 ```bash
 # Clone repository
-git clone https://github.com/AethereusSF/Salesforce-MCP-Server
+git clone https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server
 cd Salesforce-MCP-Server
 
 # Create virtual environment
@@ -495,9 +495,9 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ## 🆘 Support
 
-- **Issues:** [GitHub Issues](https://github.com/AethereusSF/Salesforce-MCP-Server/issues)
+- **Issues:** [GitHub Issues](https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server/issues)
 - **Documentation:** [Complete Guide](COMPLETE_GUIDE.md)
-- **Discussions:** [GitHub Discussions](https://github.com/AethereusSF/Salesforce-MCP-Server/discussions)
+- **Discussions:** [GitHub Discussions](https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server/discussions)
 
 ---
 
@@ -505,7 +505,7 @@ MIT License - See [LICENSE](LICENSE) for details
 
 If this project saved you time, please star the repository! ⭐
 
-[![Star History Chart](https://api.star-history.com/svg?repos=AethereusSF/Salesforce-MCP-Server&type=Date)](https://star-history.com/#AethereusSF/Salesforce-MCP-Server&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=AethereusSF/Salesforce-MCP-Server&type=Date)](https://github.com/UltralegendSam-Fs/Salesforce-MCP-Server&Date)
 
 ---
 
