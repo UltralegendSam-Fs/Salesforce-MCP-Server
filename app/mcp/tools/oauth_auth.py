@@ -9,6 +9,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs, urlencode
 from typing import Dict, Any
 import socket
+from simple_salesforce import Salesforce
 
 from app.mcp.server import register_tool
 from app.config import get_config
@@ -23,30 +24,61 @@ class SalesforceCallbackHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_url = urlparse(self.path)
         query_params = parse_qs(parsed_url.query)
-        
+
         if parsed_url.path in ['/', '/OauthRedirect']:
             if 'code' in query_params:
                 auth_code = query_params['code'][0]
                 state = query_params.get('state', [None])[0]
-                
+
                 _oauth_callback_data[state] = {
                     'code': auth_code,
                     'timestamp': time.time()
                 }
-                
+
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                self.wfile.write(b'<html><body><h2>Login Success! Close this window.</h2></body></html>')
-                
+                html_response = b'''<html>
+                <head><title>Salesforce Authentication</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h2 style="color: #2e844a;">Authentication Received</h2>
+                    <p>Processing your login... You can close this window.</p>
+                    <p style="color: #666; font-size: 14px;">Check Claude Desktop for the login status.</p>
+                </body>
+                </html>'''
+                self.wfile.write(html_response)
+
             elif 'error' in query_params:
                 error = query_params['error'][0]
-                _oauth_callback_data['error'] = {'error': error}
+                error_description = query_params.get('error_description', ['Unknown error'])[0]
+                _oauth_callback_data['error'] = {
+                    'error': error,
+                    'description': error_description
+                }
                 self.send_response(400)
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                self.wfile.write(b'<html><body><h2>Login Failed</h2></body></html>')
-    
+                html_response = f'''<html>
+                <head><title>Salesforce Authentication Failed</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h2 style="color: #c23934;">Authentication Failed</h2>
+                    <p><strong>Error:</strong> {error}</p>
+                    <p><strong>Description:</strong> {error_description}</p>
+                    <hr style="width: 50%; margin: 30px auto;">
+                    <h3>Common Solutions:</h3>
+                    <ul style="text-align: left; max-width: 500px; margin: 20px auto;">
+                        <li>Try using username/password login instead</li>
+                        <li>Check if your org allows OAuth authentication</li>
+                        <li>Verify you have the correct permissions</li>
+                        <li>Contact your Salesforce administrator</li>
+                    </ul>
+                    <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                        You can close this window and check Claude Desktop.
+                    </p>
+                </body>
+                </html>'''.encode('utf-8')
+                self.wfile.write(html_response)
+
     def log_message(self, format, *args):
         pass
 
@@ -198,29 +230,51 @@ def _do_login(org_type: str, auth_url: str) -> str:
                     'redirect_uri': redirect_uri,
                     'code': callback_data['code']
                 }
-                
-                response = requests.post(token_url, data=token_data, timeout=30)
-                response.raise_for_status()
-                token_response = response.json()
-                
-                # Store token
-                user_id = token_response.get('id', '').split('/')[-1] or 'user'
-                _oauth_tokens[user_id] = {
-                    'access_token': token_response['access_token'],
-                    'refresh_token': token_response.get('refresh_token'),
-                    'instance_url': token_response['instance_url'],
-                    'user_id': user_id,
-                    'login_timestamp': time.time(),
-                    'org_type': org_type
-                }
-                
-                return _create_json_response(
-                    True,
-                    message="Login successful",
-                    user_id=user_id,
-                    instance_url=token_response['instance_url'],
-                    org_type=org_type
-                )
+
+                try:
+                    response = requests.post(token_url, data=token_data, timeout=30)
+                    response.raise_for_status()
+                    token_response = response.json()
+
+                    # Store token
+                    user_id = token_response.get('id', '').split('/')[-1] or 'user'
+                    _oauth_tokens[user_id] = {
+                        'access_token': token_response['access_token'],
+                        'refresh_token': token_response.get('refresh_token'),
+                        'instance_url': token_response['instance_url'],
+                        'user_id': user_id,
+                        'login_timestamp': time.time(),
+                        'org_type': org_type
+                    }
+
+                    return _create_json_response(
+                        True,
+                        message="Login successful",
+                        user_id=user_id,
+                        instance_url=token_response['instance_url'],
+                        org_type=org_type
+                    )
+                except requests.exceptions.HTTPError as http_err:
+                    error_detail = "Token exchange failed"
+                    try:
+                        error_json = response.json()
+                        error_detail = f"{error_json.get('error', 'unknown')}: {error_json.get('error_description', 'No description')}"
+                    except:
+                        error_detail = f"HTTP {response.status_code}: {str(http_err)}"
+
+                    return _create_json_response(
+                        False,
+                        error="OAuth token exchange failed",
+                        details=error_detail,
+                        suggestion="Try using username/password login instead with salesforce_login_username_password"
+                    )
+                except Exception as token_err:
+                    return _create_json_response(
+                        False,
+                        error="Token processing failed",
+                        details=str(token_err),
+                        suggestion="Try using username/password login instead with salesforce_login_username_password"
+                    )
             
             elif 'error' in _oauth_callback_data:
                 # Error case
@@ -231,8 +285,9 @@ def _do_login(org_type: str, auth_url: str) -> str:
                     pass
                 return _create_json_response(
                     False,
-                    error="Login failed",
-                    details=error_data.get('error', 'Unknown error')
+                    error="OAuth authorization failed",
+                    details=f"{error_data.get('error', 'Unknown error')}: {error_data.get('description', '')}",
+                    suggestion="Try using username/password login instead with salesforce_login_username_password"
                 )
             
             time.sleep(1)
@@ -322,3 +377,69 @@ def refresh_salesforce_token(user_id: str) -> bool:
         return True
     except:
         return False
+
+@register_tool
+def salesforce_login_username_password(username: str, password: str, security_token: str = "", is_sandbox: bool = False) -> str:
+    """
+    Login to Salesforce using username and password.
+
+    Args:
+        username: Salesforce username (email)
+        password: Salesforce password
+        security_token: Security token (optional if IP is trusted, otherwise required)
+        is_sandbox: Set to True for sandbox orgs, False for production
+
+    Returns:
+        JSON response with login status
+
+    Example:
+        salesforce_login_username_password(
+            username="user@example.com",
+            password="mypassword",
+            security_token="AbC123XyZ",
+            is_sandbox=True
+        )
+
+    Note: Security token can be found in Salesforce under:
+    Setup → Personal Setup → My Personal Information → Reset My Security Token
+    """
+    try:
+        # Combine password and security token
+        full_password = password + security_token
+
+        # Determine domain
+        domain = 'test' if is_sandbox else 'login'
+
+        # Connect to Salesforce
+        sf = Salesforce(
+            username=username,
+            password=full_password,
+            domain=domain
+        )
+
+        # Store token info
+        user_id = sf.sf_instance.split('.')[0]  # Extract org ID from instance URL
+        _oauth_tokens[user_id] = {
+            'access_token': sf.session_id,
+            'refresh_token': None,
+            'instance_url': f"https://{sf.sf_instance}",
+            'user_id': user_id,
+            'login_timestamp': time.time(),
+            'org_type': 'sandbox' if is_sandbox else 'production',
+            'sf_client': sf  # Store the Salesforce client for later use
+        }
+
+        return _create_json_response(
+            True,
+            message="Login successful with username/password",
+            user_id=user_id,
+            instance_url=f"https://{sf.sf_instance}",
+            org_type='sandbox' if is_sandbox else 'production'
+        )
+
+    except Exception as e:
+        error_msg = str(e)
+        return _create_json_response(
+            False,
+            error=f"Login failed: {error_msg}"
+        )
