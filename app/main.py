@@ -8,6 +8,8 @@ from app.mcp.server import mcp_server, tool_registry
 # If you add more tool files later, import them here too.
 from app.mcp.tools import oauth_auth as _oauth_auth  # noqa: F401
 from app.mcp.tools import dynamic_tools as _dynamic_tools  # noqa: F401
+from app.mcp.tools import user_management as _user_management  # noqa: F401
+from app.mcp.tools import advanced_comparison as _advanced_comparison  # noqa: F401
 
 if __name__ == "__main__":
     config = get_config()
