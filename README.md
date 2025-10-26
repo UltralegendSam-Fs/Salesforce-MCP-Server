@@ -14,12 +14,12 @@
 
 ## ✨ What is This?
 
-Transform Claude Desktop into a **powerful Salesforce IDE** with 97+ tools for metadata management, testing, multi-org operations, and more. No manual API calls, no context switching - just natural language commands.
+Transform Claude Desktop into a **powerful Salesforce IDE** with 102+ tools for metadata management, testing, multi-org operations, and more. No manual API calls, no context switching - just natural language commands.
 
 ### Key Features
 
 - 🔐 **One-Click OAuth** - Browser-based authentication for Production, Sandbox, and Custom Domains
-- 🛠️ **97+ Professional Tools** - Complete Salesforce API coverage
+- 🛠️ **102+ Professional Tools** - Complete Salesforce API coverage
 - 🌐 **Multi-Org Management** - Work with multiple orgs simultaneously and compare metadata
 - 📦 **Bulk Operations** - Handle thousands of records with Bulk API 2.0
 - 🧪 **Apex Testing** - Run tests, get coverage, debug with full logs
@@ -120,12 +120,13 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ---
 
-## 🛠️ Tool Categories (97 Total)
+## 🛠️ Tool Categories (102 Total)
 
-### 🔐 Authentication & Sessions (5)
+### 🔐 Authentication & Sessions (6)
 - `salesforce_production_login` - OAuth to production org
 - `salesforce_sandbox_login` - OAuth to sandbox (test.salesforce.com)
 - `salesforce_custom_login` - OAuth to custom domain
+- `salesforce_login_username_password` - Login with username/password/token
 - `salesforce_logout` - Clear all sessions
 - `salesforce_auth_status` - Check authentication status
 
@@ -208,6 +209,21 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ### 🎯 Core Operations (2)
 - `execute_soql_query` - Run any SOQL query
 - `get_metadata_deploy_status` - Check deployment status
+
+### 👥 User Management & Permissions (6)
+- `change_user_profile` - Change a user's profile
+- `assign_permission_set` - Assign permission set to a user
+- `remove_permission_set` - Remove permission set from a user
+- `list_user_permissions` - List user's permission sets and profile
+- `list_available_profiles` - List all profiles in the org
+- `list_available_permission_sets` - List all permission sets in the org
+
+### 🔄 Advanced Comparison Tools (5)
+- `compare_profiles` - Compare two profiles side-by-side
+- `compare_permission_sets` - Compare two permission sets
+- `compare_object_field_counts` - Compare field counts between orgs
+- `find_similar_fields_across_objects` - Find fields with similar names/types
+- `compare_org_object_counts` - Compare total object counts between orgs
 
 ---
 
@@ -325,6 +341,39 @@ public class AccountService {
 # Scheduled Jobs
 "List all scheduled Apex jobs"
 "Delete scheduled job 0884x000000XyzA"
+```
+
+### User Management
+
+```
+# Change User Profiles
+"Change profile for user john.doe@example.com to System Administrator"
+"Assign Standard User profile to jane.smith@example.com"
+
+# Manage Permission Sets
+"Assign Sales_User permission set to john.doe@example.com"
+"Remove Marketing_Access permission set from jane.smith@example.com"
+"List all permission sets for user john.doe@example.com"
+
+# Query Profiles and Permission Sets
+"List all available profiles in the org"
+"Show me all permission sets"
+```
+
+### Advanced Comparison
+
+```
+# Profile Comparison
+"Compare System Administrator and Standard User profiles"
+"What are the differences between Sales User and Service User profiles?"
+
+# Permission Set Comparison
+"Compare Marketing_Admin and Marketing_User permission sets"
+
+# Cross-Org Comparison
+"Compare Account object fields between my two connected orgs"
+"Find similar fields across Account and Contact objects"
+"Compare total object counts between production and sandbox"
 ```
 
 ---
@@ -451,18 +500,21 @@ Before submitting PRs:
 
 ## 🎯 Roadmap
 
-### In Progress
+### Completed ✅
 - ✅ Multi-org management (COMPLETED)
 - ✅ Bulk operations (COMPLETED)
 - ✅ Schema analysis tools (COMPLETED)
 - ✅ Apex testing suite (COMPLETED)
+- ✅ User management tools (COMPLETED)
+- ✅ Profile and permission set analysis (COMPLETED)
+- ✅ Advanced comparison tools (COMPLETED)
 
-### Planned
+### Planned 🔄
 - 🔄 Enhanced Flow builder capabilities
-- 🔄 Profile and permission set analysis
 - 🔄 Data quality checking
 - 🔄 Automated backup scheduling
 - 🔄 CI/CD integration helpers
+- 🔄 Token persistence with encryption
 
 ### Community Requests
 - 📊 Dashboard creation tools
