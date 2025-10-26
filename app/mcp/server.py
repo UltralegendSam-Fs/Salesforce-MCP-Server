@@ -47,11 +47,18 @@ def create_model_from_func(func, arg_descriptions):
 # Read from environment variables (set by config)
 http_host = os.getenv("SFMCP_HTTP_HOST", "0.0.0.0")
 http_port = int(os.getenv("PORT", os.getenv("SFMCP_HTTP_PORT", "8000")))
+api_key = os.getenv("SFMCP_API_KEY", "your-secret-api-key-change-this")
+
+# Log API key info (masked for security)
+if api_key:
+    masked_key = api_key[:8] + "..." if len(api_key) > 8 else "***"
+    logger.info(f"🔒 API Key authentication enabled: {masked_key}")
 
 mcp_server = FastMCP(
     name="salesforce-production-server",
     host=http_host,
-    port=http_port
+    port=http_port,
+    api_key=api_key  # Enable API key authentication
 )
 
 tool_registry = {}
