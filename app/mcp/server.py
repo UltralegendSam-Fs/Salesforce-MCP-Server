@@ -45,8 +45,8 @@ def create_model_from_func(func, arg_descriptions):
 # ✅ FIXED: Removed version parameter
 # Configure for both stdio and HTTP/SSE modes
 # Read from environment variables (set by config)
-http_host = os.getenv("SFMCP_HTTP_HOST", "127.0.0.1")
-http_port = int(os.getenv("SFMCP_HTTP_PORT", "8000"))
+http_host = os.getenv("SFMCP_HTTP_HOST", "0.0.0.0")
+http_port = int(os.getenv("PORT", os.getenv("SFMCP_HTTP_PORT", "8000")))
 
 mcp_server = FastMCP(
     name="salesforce-production-server",
