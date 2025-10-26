@@ -8,6 +8,11 @@ from typing import List, Optional, Dict, Any
 
 from app.mcp.server import register_tool
 from app.services.salesforce import get_salesforce_connection
+from app.mcp.tools.utils import (
+    format_error_response,
+    format_success_response,
+    ResponseSizeManager
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +71,7 @@ def build_soql_query(
 
 
 @register_tool
-def get_object_fields(object_name: str, field_type: str = "all") -> str:
+def get_object_fields(object_name: str, field_type: str = "all", max_fields: int = 100, field_offset: int = 0) -> str:
     """Get all fields for an object with their metadata.
 
     Added by Sameer
@@ -74,6 +79,8 @@ def get_object_fields(object_name: str, field_type: str = "all") -> str:
     Args:
         object_name: Object API name
         field_type: Filter by field type (all, custom, standard, required, updateable)
+        max_fields: Maximum number of fields to return (default: 100, use 0 for all)
+        field_offset: Starting position for field pagination (default: 0)
 
     Returns:
         JSON with field list and metadata
@@ -113,17 +120,31 @@ def get_object_fields(object_name: str, field_type: str = "all") -> str:
                     "referenced_to": field.get("referenceTo", [])
                 })
 
-        return json.dumps({
+        # Apply pagination
+        total_filtered = len(filtered_fields)
+        if max_fields > 0:
+            paginated_fields = filtered_fields[field_offset:field_offset + max_fields]
+        else:
+            paginated_fields = filtered_fields[field_offset:]
+
+        response = {
             "success": True,
             "object": object_name,
             "field_type_filter": field_type,
-            "total_fields": len(filtered_fields),
-            "fields": filtered_fields
-        }, indent=2)
+            "total_fields": total_filtered,
+            "returned_fields": len(paginated_fields),
+            "field_offset": field_offset,
+            "has_more_fields": (field_offset + len(paginated_fields)) < total_filtered,
+            "fields": paginated_fields
+        }
+
+        # Check response size and add warnings if needed
+        response = ResponseSizeManager.check_response_size(response)
+        return json.dumps(response, indent=2)
 
     except Exception as e:
         logger.exception("get_object_fields failed")
-        return json.dumps({"success": False, "error": str(e)})
+        return format_error_response(e, context="get_object_fields")
 
 
 @register_tool

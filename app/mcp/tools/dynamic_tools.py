@@ -12,6 +12,11 @@ import base64
 from app.mcp.server import register_tool
 from app.services.salesforce import get_salesforce_connection
 from app.utils.validators import validate_soql_query, validate_api_name, ValidationError
+from app.mcp.tools.utils import (
+    format_error_response,
+    format_success_response,
+    ResponseSizeManager
+)
 
 logger = logging.getLogger(__name__)
 
@@ -2134,16 +2139,31 @@ def upsert_lwc_component(
 # =============================================================================
 
 @register_tool
-def fetch_object_metadata(object_name: str) -> str:
-    """Return describe() + record type info for any object."""
+def fetch_object_metadata(object_name: str, max_fields: int = 100, field_offset: int = 0) -> str:
+    """Return describe() + record type info for any object.
+
+    Args:
+        object_name: API name of the object
+        max_fields: Maximum number of fields to return (default: 100, use 0 for all)
+        field_offset: Starting position for field pagination (default: 0)
+    """
     try:
         sf = get_salesforce_connection()
         desc = getattr(sf, object_name).describe()
     except Exception:
         return json.dumps({"success": False, "error": f"{object_name} not found"}, indent=2)
 
+    all_fields = desc["fields"]
+    total_field_count = len(all_fields)
+
+    # Apply pagination to fields
+    if max_fields > 0:
+        fields_to_process = all_fields[field_offset:field_offset + max_fields]
+    else:
+        fields_to_process = all_fields[field_offset:]
+
     fields = []
-    for f in desc["fields"]:
+    for f in fields_to_process:
         fd = {
             "name": f["name"],
             "label": f["label"],
@@ -2178,18 +2198,22 @@ def fetch_object_metadata(object_name: str) -> str:
     except Exception:
         pass
 
-    return json.dumps(
-        {
-            "success": True,
-            "objectName": object_name,
-            "label": desc["label"],
-            "isCustom": desc["custom"],
-            "totalFields": len(fields),
-            "fields": fields,
-            "recordTypes": record_types,
-        },
-        indent=2,
-    )
+    response = {
+        "success": True,
+        "objectName": object_name,
+        "label": desc["label"],
+        "isCustom": desc["custom"],
+        "totalFields": total_field_count,
+        "returnedFields": len(fields),
+        "fieldOffset": field_offset,
+        "hasMoreFields": (field_offset + len(fields)) < total_field_count,
+        "fields": fields,
+        "recordTypes": record_types,
+    }
+
+    # Check response size and add warnings if needed
+    response = ResponseSizeManager.check_response_size(response)
+    return json.dumps(response, indent=2)
 
 
 @register_tool

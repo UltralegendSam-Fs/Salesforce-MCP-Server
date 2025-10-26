@@ -9,6 +9,11 @@ from typing import List, Optional, Dict, Any
 
 from app.mcp.server import register_tool
 from app.services.salesforce import get_salesforce_connection
+from app.mcp.tools.utils import (
+    format_error_response,
+    format_success_response,
+    ResponseSizeManager
+)
 
 logger = logging.getLogger(__name__)
 
@@ -185,7 +190,10 @@ def get_apex_test_coverage(class_name: Optional[str] = None) -> str:
 
         return json.dumps({
             "success": True,
-            "overall_coverage": f"{coverage_percent:.1f}%",
+            "overall_coverage": {
+                "coverage_percent": round(coverage_percent, 1),
+                "coverage_string": f"{coverage_percent:.1f}%"
+            },
             "total_lines": total_lines,
             "covered_lines": covered_lines,
             "uncovered_lines": total_lines - covered_lines,
@@ -198,10 +206,14 @@ def get_apex_test_coverage(class_name: Optional[str] = None) -> str:
 
 
 @register_tool
-def list_apex_test_classes() -> str:
+def list_apex_test_classes(max_results: int = 100, offset: int = 0) -> str:
     """List all Apex test classes in the org.
 
     Added by Sameer
+
+    Args:
+        max_results: Maximum number of test classes to return (default: 100, use 0 for all)
+        offset: Starting position for pagination (default: 0)
 
     Returns:
         JSON string with list of test classes
@@ -209,6 +221,7 @@ def list_apex_test_classes() -> str:
     try:
         sf = get_salesforce_connection()
 
+        # Build query with pagination
         query = """
             SELECT Id, Name, ApiVersion, Status, LengthWithoutComments
             FROM ApexClass
@@ -216,15 +229,36 @@ def list_apex_test_classes() -> str:
             ORDER BY Name
         """
 
+        if max_results > 0:
+            query += f" LIMIT {max_results} OFFSET {offset}"
+        elif offset > 0:
+            query += f" OFFSET {offset}"
+
         result = sf.toolingexecute(f"query/?q={query}")
         test_classes = result.get("records", [])
 
-        return json.dumps({
+        # Get total count without limit
+        count_query = """
+            SELECT COUNT()
+            FROM ApexClass
+            WHERE Name LIKE '%Test%'
+        """
+        count_result = sf.toolingexecute(f"query/?q={count_query}")
+        total_count = count_result.get("totalSize", len(test_classes))
+
+        response = {
             "success": True,
-            "total_count": len(test_classes),
+            "total_count": total_count,
+            "returned_count": len(test_classes),
+            "offset": offset,
+            "has_more": (offset + len(test_classes)) < total_count if max_results > 0 else False,
             "test_classes": test_classes
-        }, indent=2)
+        }
+
+        # Check response size and add warnings if needed
+        response = ResponseSizeManager.check_response_size(response)
+        return json.dumps(response, indent=2)
 
     except Exception as e:
         logger.exception("list_apex_test_classes failed")
-        return json.dumps({"success": False, "error": str(e)})
+        return format_error_response(e, context="list_apex_test_classes")

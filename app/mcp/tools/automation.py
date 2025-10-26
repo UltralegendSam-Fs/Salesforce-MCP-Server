@@ -266,7 +266,8 @@ def execute_anonymous_apex(apex_code: str) -> str:
 @register_tool
 def get_debug_logs(
     user_name: Optional[str] = None,
-    max_logs: int = 10
+    max_logs: int = 10,
+    limit: Optional[int] = None
 ) -> str:
     """Retrieve recent debug logs.
 
@@ -274,11 +275,14 @@ def get_debug_logs(
 
     Args:
         user_name: Filter by username (None = current user)
-        max_logs: Maximum logs to retrieve
+        max_logs: Maximum logs to retrieve (deprecated, use limit)
+        limit: Maximum logs to retrieve (preferred parameter name)
 
     Returns:
         JSON with debug log list
     """
+    # Support both max_logs and limit parameters
+    actual_limit = limit if limit is not None else max_logs
     try:
         sf = get_salesforce_connection()
 
@@ -291,7 +295,7 @@ def get_debug_logs(
         if user_name:
             query += f" WHERE LogUser.Name = '{user_name}'"
 
-        query += f" ORDER BY StartTime DESC LIMIT {max_logs}"
+        query += f" ORDER BY StartTime DESC LIMIT {actual_limit}"
 
         result = sf.toolingexecute(f"query/?q={query}")
         logs = result.get("records", [])

@@ -8,6 +8,11 @@ from typing import Optional
 
 from app.mcp.server import register_tool
 from app.services.salesforce import get_salesforce_connection
+from app.mcp.tools.utils import (
+    format_error_response,
+    format_success_response,
+    ResponseSizeManager
+)
 
 logger = logging.getLogger(__name__)
 
@@ -220,14 +225,37 @@ def get_current_user_info() -> str:
     try:
         sf = get_salesforce_connection()
 
-        # Query User object for current user
-        query = """
-            SELECT Id, Username, Name, Email, Profile.Name, UserRole.Name,
-                   IsActive, UserType, LastLoginDate, CreatedDate
-            FROM User
-            WHERE Id = UserInfo.getUserId()
-            LIMIT 1
-        """
+        # Get current user ID from stored OAuth tokens
+        from app.mcp.tools.oauth_auth import get_stored_tokens
+        stored_tokens = get_stored_tokens()
+
+        if not stored_tokens:
+            raise Exception("No stored OAuth tokens found. Please login first.")
+
+        # Get the first (or active) user's ID
+        user_id = None
+        for uid, token_data in stored_tokens.items():
+            user_id = token_data.get('user_id')
+            break
+
+        if not user_id:
+            # Fallback: Query current user via UserInfo
+            query = """
+                SELECT Id, Username, Name, Email, Profile.Name, UserRole.Name,
+                       IsActive, UserType, LastLoginDate, CreatedDate
+                FROM User
+                WHERE Id = UserInfo.getUserId()
+                LIMIT 1
+            """
+        else:
+            # Query User object for current user using the stored user_id
+            query = f"""
+                SELECT Id, Username, Name, Email, Profile.Name, UserRole.Name,
+                       IsActive, UserType, LastLoginDate, CreatedDate
+                FROM User
+                WHERE Id = '{user_id}'
+                LIMIT 1
+            """
 
         result = sf.query(query)
         user_info = result.get("records", [{}])[0]
@@ -241,7 +269,7 @@ def get_current_user_info() -> str:
 
     except Exception as e:
         logger.exception("get_current_user_info failed")
-        return json.dumps({"success": False, "error": str(e)})
+        return format_error_response(e, context="get_current_user_info")
 
 
 @register_tool
@@ -259,7 +287,7 @@ def list_installed_packages() -> str:
         query = """
             SELECT Id, SubscriberPackageId, SubscriberPackage.Name,
                    SubscriberPackage.NamespacePrefix,
-                   SubscriberPackageVersion.Name as VersionName,
+                   SubscriberPackageVersion.Name,
                    SubscriberPackageVersion.MajorVersion,
                    SubscriberPackageVersion.MinorVersion,
                    SubscriberPackageVersion.PatchVersion,
@@ -271,15 +299,18 @@ def list_installed_packages() -> str:
         result = sf.query(query)
         packages = result.get("records", [])
 
-        return json.dumps({
-            "success": True,
+        response = {
             "total_count": len(packages),
             "packages": packages
-        }, indent=2)
+        }
+
+        # Check response size and add warnings if needed
+        response = ResponseSizeManager.check_response_size(response)
+        return json.dumps(response, indent=2)
 
     except Exception as e:
         logger.exception("list_installed_packages failed")
-        return json.dumps({"success": False, "error": str(e)})
+        return format_error_response(e, context="list_installed_packages")
 
 
 @register_tool
@@ -306,7 +337,7 @@ def get_api_usage_stats(days: int = 7) -> str:
 
         # Query EventLogFile for API usage
         query = f"""
-            SELECT LogDate, ApiType, ApiVersion, Method, SUM(Run) as TotalCalls
+            SELECT LogDate, ApiType, ApiVersion, Method, COUNT(Id)
             FROM EventLogFile
             WHERE LogDate >= {start_date}
             AND EventType = 'API'
@@ -317,13 +348,16 @@ def get_api_usage_stats(days: int = 7) -> str:
         result = sf.query(query)
         usage_stats = result.get("records", [])
 
-        return json.dumps({
-            "success": True,
+        response = {
             "days": days,
             "total_records": len(usage_stats),
             "usage_stats": usage_stats
-        }, indent=2)
+        }
+
+        # Check response size and add warnings if needed
+        response = ResponseSizeManager.check_response_size(response)
+        return json.dumps(response, indent=2)
 
     except Exception as e:
         logger.exception("get_api_usage_stats failed")
-        return json.dumps({"success": False, "error": str(e)})
+        return format_error_response(e, context="get_api_usage_stats")
