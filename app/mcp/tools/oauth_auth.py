@@ -397,7 +397,7 @@ def refresh_salesforce_token(user_id: str) -> bool:
         return False
 
 @register_tool
-def salesforce_login_username_password(username: str, password: str, security_token: str = "", is_sandbox: bool = False) -> str:
+def salesforce_login_username_password(username: str, password: str, security_token: str = "", domain: str = "login") -> str:
     """
     Login to Salesforce using username and password.
 
@@ -405,7 +405,7 @@ def salesforce_login_username_password(username: str, password: str, security_to
         username: Salesforce username (email)
         password: Salesforce password
         security_token: Security token (optional if IP is trusted, otherwise required)
-        is_sandbox: Set to True for sandbox orgs, False for production
+        domain: Salesforce domain (test, login, or custom domain like mydomain.my.salesforce.com)
 
     Returns:
         JSON response with login status
@@ -415,23 +415,19 @@ def salesforce_login_username_password(username: str, password: str, security_to
             username="user@example.com",
             password="mypassword",
             security_token="AbC123XyZ",
-            is_sandbox=True
+            domain="test"  # or "login" for production, or "mydomain.my" for custom
         )
 
     Note: Security token can be found in Salesforce under:
     Setup → Personal Setup → My Personal Information → Reset My Security Token
     """
     try:
-        # Combine password and security token
-        full_password = password + security_token
-
-        # Determine domain
-        domain = 'test' if is_sandbox else 'login'
-
         # Connect to Salesforce
+        # Note: simple_salesforce expects security_token as separate parameter
         sf = Salesforce(
             username=username,
-            password=full_password,
+            password=password,
+            security_token=security_token,
             domain=domain
         )
 
@@ -443,6 +439,9 @@ def salesforce_login_username_password(username: str, password: str, security_to
         user_id = user_query['records'][0]['Id']
         instance_url = f"https://{sf.sf_instance}"
 
+        # Determine org type from domain
+        org_type = 'sandbox' if domain == 'test' else 'production' if domain == 'login' else 'custom'
+
         # Store token info
         _oauth_tokens[user_id] = {
             'access_token': sf.session_id,
@@ -450,7 +449,8 @@ def salesforce_login_username_password(username: str, password: str, security_to
             'instance_url': instance_url,
             'user_id': user_id,
             'login_timestamp': time.time(),
-            'org_type': 'sandbox' if is_sandbox else 'production',
+            'org_type': org_type,
+            'domain': domain,
             'sf_client': sf  # Store the Salesforce client for later use
         }
 
@@ -459,7 +459,8 @@ def salesforce_login_username_password(username: str, password: str, security_to
             message="Login successful with username/password",
             user_id=user_id,
             instance_url=instance_url,
-            org_type='sandbox' if is_sandbox else 'production'
+            org_type=org_type,
+            domain=domain
         )
 
     except Exception as e:
