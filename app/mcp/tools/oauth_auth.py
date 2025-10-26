@@ -5,6 +5,7 @@ import json
 import requests
 import secrets
 import psutil  # Added for port management
+import logging
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs, urlencode
 from typing import Dict, Any
@@ -15,6 +16,8 @@ from app.mcp.server import register_tool
 from app.config import get_config
 from app.utils.retry import retry
 from app.utils.validators import validate_url
+
+logger = logging.getLogger(__name__)
 
 # Global storage
 _oauth_tokens = {}
@@ -112,6 +115,12 @@ def _free_port(port: int) -> None:
 
 def _start_callback_server(port: int = 1717):
     """Start callback server after ensuring port is free (Windows-safe, dual-stack)."""
+    # Skip OAuth callback server in hosted/production environments
+    import os
+    if os.getenv('RENDER') or os.getenv('SFMCP_OAUTH_DISABLED') == 'true':
+        logger.warning("OAuth callback server disabled for hosted deployment")
+        return None
+
     _free_port(port)
 
     # Try dual-stack first (bind to '::' so both ::1 and 127.0.0.1 work)
@@ -194,7 +203,16 @@ def _do_login(org_type: str, auth_url: str) -> str:
         
         # Start server (this will automatically free the port first)
         server = _start_callback_server(callback_port)
-        
+
+        # Check if OAuth is disabled (hosted environment)
+        if server is None:
+            return _create_json_response(
+                False,
+                error="OAuth login is not available in hosted deployment",
+                message="Please use salesforce_login_username_password instead",
+                hint="OAuth requires local browser access which is not available on hosted servers"
+            )
+
         # Build URL
         params = {
             'response_type': 'code',
