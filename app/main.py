@@ -14,7 +14,21 @@ from app.mcp.tools import advanced_comparison as _advanced_comparison  # noqa: F
 if __name__ == "__main__":
     config = get_config()
     logging.basicConfig(stream=sys.stderr, level=getattr(logging, config.log_level.upper()))
-    if "--mcp-stdio" in sys.argv:
+
+    # Check for HTTP/SSE mode
+    if "--http" in sys.argv or "--sse" in sys.argv:
+        logging.info("MCP starting (HTTP/SSE)")
+        logging.info("Host: %s", config.http_host)
+        logging.info("Port: %s", config.http_port)
+        logging.info("API Key: %s", config.api_key[:8] + "..." if len(config.api_key) > 8 else "***")
+        logging.info("Tools: %s", ", ".join(tool_registry.keys()) or "(none)")
+        mcp_server.run(transport="sse")
+    elif "--mcp-stdio" in sys.argv:
         logging.info("MCP starting (stdio)")
+        logging.info("Tools: %s", ", ".join(tool_registry.keys()) or "(none)")
+        mcp_server.run(transport="stdio")
+    else:
+        # Default to stdio for backward compatibility
+        logging.info("MCP starting (stdio - default)")
         logging.info("Tools: %s", ", ".join(tool_registry.keys()) or "(none)")
         mcp_server.run(transport="stdio")

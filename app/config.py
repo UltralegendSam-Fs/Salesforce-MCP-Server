@@ -46,6 +46,11 @@ class SalesforceConfig(BaseSettings):
     # Development
     debug_mode: bool = Field(default=False, description="Enable debug mode")
 
+    # HTTP/SSE Server Configuration
+    http_host: str = Field(default="0.0.0.0", description="HTTP server host (0.0.0.0 for network access)")
+    http_port: int = Field(default=8000, description="HTTP server port")
+    api_key: str = Field(default="your-secret-api-key-change-this", description="API key for authentication")
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
