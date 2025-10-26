@@ -435,12 +435,19 @@ def salesforce_login_username_password(username: str, password: str, security_to
             domain=domain
         )
 
+        # Get the actual User ID by querying UserInfo
+        user_query = sf.query("SELECT Id FROM User WHERE Username = '{}'".format(username))
+        if user_query['totalSize'] == 0:
+            raise Exception(f"Could not find user with username: {username}")
+
+        user_id = user_query['records'][0]['Id']
+        instance_url = f"https://{sf.sf_instance}"
+
         # Store token info
-        user_id = sf.sf_instance.split('.')[0]  # Extract org ID from instance URL
         _oauth_tokens[user_id] = {
             'access_token': sf.session_id,
             'refresh_token': None,
-            'instance_url': f"https://{sf.sf_instance}",
+            'instance_url': instance_url,
             'user_id': user_id,
             'login_timestamp': time.time(),
             'org_type': 'sandbox' if is_sandbox else 'production',
@@ -451,7 +458,7 @@ def salesforce_login_username_password(username: str, password: str, security_to
             True,
             message="Login successful with username/password",
             user_id=user_id,
-            instance_url=f"https://{sf.sf_instance}",
+            instance_url=instance_url,
             org_type='sandbox' if is_sandbox else 'production'
         )
 
