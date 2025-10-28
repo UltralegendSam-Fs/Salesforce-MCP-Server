@@ -17,7 +17,8 @@ from app.mcp.tools.utils import (
 logger = logging.getLogger(__name__)
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def build_soql_query(
     object_name: str,
     fields: List[str],
@@ -70,7 +71,8 @@ def build_soql_query(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def get_object_fields(object_name: str, field_type: str = "all", max_fields: int = 100, field_offset: int = 0) -> str:
     """Get all fields for an object with their metadata.
 
@@ -147,7 +149,8 @@ def get_object_fields(object_name: str, field_type: str = "all", max_fields: int
         return format_error_response(e, context="get_object_fields")
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def get_field_relationships(object_name: str) -> str:
     """Get all relationship fields and their targets.
 
@@ -199,7 +202,8 @@ def get_field_relationships(object_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def explain_soql_query(query: str) -> str:
     """Analyze a SOQL query and provide optimization suggestions.
 

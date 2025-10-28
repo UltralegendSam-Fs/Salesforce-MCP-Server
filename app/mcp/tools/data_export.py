@@ -14,7 +14,8 @@ from app.services.salesforce import get_salesforce_connection
 logger = logging.getLogger(__name__)
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def export_data_to_csv(
     soql_query: str,
     include_header: bool = True,
@@ -82,7 +83,8 @@ def export_data_to_csv(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def export_object_data(
     object_name: str,
     fields: Optional[List[str]] = None,
@@ -158,7 +160,8 @@ def export_object_data(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def backup_object_records(
     object_name: str,
     backup_name: str,

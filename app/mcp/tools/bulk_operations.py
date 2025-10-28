@@ -15,7 +15,8 @@ from app.services.salesforce import get_salesforce_connection
 logger = logging.getLogger(__name__)
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def bulk_insert_records(
     object_name: str,
     records: List[Dict[str, Any]],
@@ -142,7 +143,8 @@ def bulk_insert_records(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def bulk_update_records(
     object_name: str,
     records: List[Dict[str, Any]],
@@ -245,7 +247,8 @@ def bulk_update_records(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def bulk_delete_records(
     object_name: str,
     record_ids: List[str],

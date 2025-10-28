@@ -313,7 +313,8 @@ def get_metadata_deploy_status(job_id: str, include_details: bool = True) -> str
 # APEX CLASS TOOLS (ENHANCED WITH CREATE)
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_apex_class(class_name: str) -> str:
     """Fetch a single **ApexClass** record (body + metadata) by Name, combining
 Tooling and Core API fields into one normalized payload.
@@ -410,7 +411,8 @@ Examples:
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_apex_class(
     class_name: str, body: str, api_version: Optional[float] = None, description: str = ""
 ) -> str:
@@ -563,7 +565,8 @@ assert res["success"], res
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_apex_class(
     class_name: str, body: str, api_version: Optional[float] = None
 ) -> str:
@@ -716,7 +719,8 @@ Implementation notes:
 # APEX TRIGGER TOOLS (ENHANCED WITH CREATE)
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_apex_trigger(trigger_name: str) -> str:
     """Fetch a single **ApexTrigger** record (body + metadata) by Name, combining
 Tooling and Core API fields into one normalized payload.
@@ -815,7 +819,8 @@ Examples:
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_apex_trigger(
     trigger_name: str, 
     body: str, 
@@ -986,7 +991,8 @@ assert res["success"], res
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_apex_trigger(
     trigger_name: str, 
     body: str, 
@@ -1151,7 +1157,8 @@ Implementation notes:
 # VALIDATION RULE TOOLS (ENHANCED WITH CREATE)
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_validation_rule(object_name: str, rule_name: str) -> str:
     """Fetch a single **ValidationRule** record (metadata) by Object and Name, combining
 Tooling and Core API fields into one normalized payload.
@@ -1251,7 +1258,8 @@ Examples:
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_validation_rule(
     object_name: str,
     rule_name: str,
@@ -1429,7 +1437,8 @@ assert res["success"], res
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_validation_rule(
     object_name: str,
     rule_name: str,
@@ -1592,7 +1601,8 @@ Implementation notes:
 # LWC TOOLS (ENHANCED WITH CREATE)
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_lwc_component(component_name: str) -> str:
     """Fetch an LWC bundle (metadata + source files) robustly via the Tooling API.
 
@@ -1748,7 +1758,8 @@ Examples:
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_lwc_component(
     component_name: str,
     html_content: str = "",
@@ -1917,7 +1928,8 @@ export default class {safe_class} extends LightningElement {{}}
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_lwc_component(
     component_name: str,
     html_content: str,
@@ -2216,7 +2228,8 @@ def fetch_object_metadata(object_name: str, max_fields: int = 100, field_offset:
     return json.dumps(response, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_custom_object(
     object_name: str,
     label: str,
@@ -2360,7 +2373,8 @@ Examples:
 # CUSTOM FIELD TOOLS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_custom_field(object_name: str, field_name: str) -> str:
     """Fetch detailed metadata for a single field by combining **Core Describe**
 and **Tooling API** information.
@@ -2456,7 +2470,8 @@ Typical usage:
         logger.error("fetch_custom_field: %s", e, exc_info=True)
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_custom_field(
     object_name: str,
     field_api_name: str,
@@ -3053,7 +3068,8 @@ def deploy_lwc_component_internal(
 # FLOW HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_flow(flow_name: str) -> str:
     """Fetch a Flow definition by API name.
 
@@ -3087,7 +3103,8 @@ def fetch_flow(flow_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_flow(
     flow_name: str,
     label: str,
@@ -3147,7 +3164,8 @@ def create_flow(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_flow(
     flow_name: str,
     label: str,
@@ -3176,7 +3194,8 @@ def upsert_flow(
 # EMAIL TEMPLATE HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_email_template(template_name: str, folder_name: str = "unfiled$public") -> str:
     """Fetch an Email Template by developer name.
 
@@ -3207,7 +3226,8 @@ def fetch_email_template(template_name: str, folder_name: str = "unfiled$public"
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_email_template(
     template_name: str,
     name: str,
@@ -3270,7 +3290,8 @@ def create_email_template(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_email_template(
     template_name: str,
     name: str,
@@ -3296,7 +3317,8 @@ def upsert_email_template(
 # PERMISSION SET HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_permission_set(permission_set_name: str) -> str:
     """Fetch a Permission Set by API name.
 
@@ -3325,7 +3347,8 @@ def fetch_permission_set(permission_set_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_permission_set(
     permission_set_name: str,
     label: str,
@@ -3374,7 +3397,8 @@ def create_permission_set(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_permission_set(
     permission_set_name: str,
     label: str,
@@ -3393,7 +3417,8 @@ def upsert_permission_set(
 # STATIC RESOURCE HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_static_resource(resource_name: str) -> str:
     """Fetch a Static Resource by name.
 
@@ -3422,7 +3447,8 @@ def fetch_static_resource(resource_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_static_resource(
     resource_name: str,
     content: str,
@@ -3486,7 +3512,8 @@ def create_static_resource(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_static_resource(
     resource_name: str,
     content: str,
@@ -3506,7 +3533,8 @@ def upsert_static_resource(
 # CUSTOM METADATA TYPE HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_custom_metadata_type(type_name: str) -> str:
     """Fetch a Custom Metadata Type definition.
 
@@ -3536,7 +3564,8 @@ def fetch_custom_metadata_type(type_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_custom_metadata_type(
     type_name: str,
     label: str,
@@ -3588,7 +3617,8 @@ def create_custom_metadata_type(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_custom_metadata_type(
     type_name: str,
     label: str,
@@ -3607,7 +3637,8 @@ def upsert_custom_metadata_type(
 # AURA COMPONENT HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_aura_component(component_name: str) -> str:
     """Fetch an Aura Component bundle by name.
 
@@ -3641,7 +3672,8 @@ def fetch_aura_component(component_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_aura_component(
     component_name: str,
     description: str = "",
@@ -3701,7 +3733,8 @@ def create_aura_component(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_aura_component(
     component_name: str,
     description: str = "",
@@ -3721,7 +3754,8 @@ def upsert_aura_component(
 # CUSTOM LABEL HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_custom_label(label_name: str) -> str:
     """Fetch a Custom Label by API name.
 
@@ -3750,7 +3784,8 @@ def fetch_custom_label(label_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_custom_label(
     label_name: str,
     value: str,
@@ -3807,7 +3842,8 @@ def create_custom_label(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_custom_label(
     label_name: str,
     value: str,
@@ -3828,7 +3864,8 @@ def upsert_custom_label(
 # RECORD TYPE HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_record_type(object_name: str, record_type_name: str) -> str:
     """Fetch a Record Type by object and developer name.
 
@@ -3859,7 +3896,8 @@ def fetch_record_type(object_name: str, record_type_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_record_type(
     object_name: str,
     record_type_name: str,
@@ -3912,7 +3950,8 @@ def create_record_type(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_record_type(
     object_name: str,
     record_type_name: str,
@@ -3932,7 +3971,8 @@ def upsert_record_type(
 # QUICK ACTION HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_quick_action(action_name: str) -> str:
     """Fetch a Quick Action by API name.
 
@@ -3962,7 +4002,8 @@ def fetch_quick_action(action_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_quick_action(
     action_name: str,
     label: str,
@@ -4027,7 +4068,8 @@ def create_quick_action(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_quick_action(
     action_name: str,
     label: str,
@@ -4047,7 +4089,8 @@ def upsert_quick_action(
 # CUSTOM TAB HANDLERS
 # =============================================================================
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def fetch_custom_tab(tab_name: str) -> str:
     """Fetch a Custom Tab by API name.
 
@@ -4077,7 +4120,8 @@ def fetch_custom_tab(tab_name: str) -> str:
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def create_custom_tab(
     tab_name: str,
     label: str,
@@ -4137,7 +4181,8 @@ def create_custom_tab(
         return json.dumps({"success": False, "error": str(e)})
 
 
-@register_tool
+# DEPRECATED: Use deploy_metadata or fetch_metadata instead
+# @register_tool
 def upsert_custom_tab(
     tab_name: str,
     label: str,

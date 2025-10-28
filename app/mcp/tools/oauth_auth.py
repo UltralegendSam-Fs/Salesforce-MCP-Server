@@ -19,7 +19,7 @@ from app.utils.validators import validate_url
 
 logger = logging.getLogger(__name__)
 
-# Global storage
+# Global storage (memory only - cleared when process ends)
 _oauth_tokens = {}
 _oauth_callback_data = {}
 

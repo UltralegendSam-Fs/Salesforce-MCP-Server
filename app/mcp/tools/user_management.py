@@ -25,7 +25,8 @@ def _create_json_response(success, **kwargs):
     return json.dumps(result, indent=2)
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def change_user_profile(username: str, profile_name: str) -> str:
     """
     Change a user's profile.
@@ -119,7 +120,8 @@ def change_user_profile(username: str, profile_name: str) -> str:
         )
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def assign_permission_set(username: str, permission_set_name: str) -> str:
     """
     Assign a permission set to a user.
@@ -226,7 +228,8 @@ def assign_permission_set(username: str, permission_set_name: str) -> str:
         )
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def remove_permission_set(username: str, permission_set_name: str) -> str:
     """
     Remove a permission set from a user.
@@ -324,7 +327,8 @@ def remove_permission_set(username: str, permission_set_name: str) -> str:
         )
 
 
-@register_tool
+# DEPRECATED: Use consolidated tool instead
+# @register_tool
 def list_user_permissions(username: str) -> str:
     """
     List all permission sets assigned to a user.
