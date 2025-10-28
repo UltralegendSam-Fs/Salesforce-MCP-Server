@@ -1373,10 +1373,11 @@ assert res["success"], res
 
     try:
         sf = get_salesforce_connection()
-        
-        # Check if validation rule already exists
-        check = sf.query(f"SELECT Id FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = '{object_name}' AND Name = '{rule_name}'")
-        if check["totalSize"] > 0:
+
+        # Check if validation rule already exists (must use Tooling API)
+        check_query = f"SELECT Id FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = '{object_name}' AND Name = '{rule_name}'"
+        check = sf.toolingexecute(f"query/?q={check_query}")
+        if check.get("size", 0) > 0:
             return json.dumps(
                 {
                     "success": False,
@@ -1551,8 +1552,10 @@ Implementation notes:
 """
     try:
         sf = get_salesforce_connection()
-        check = sf.query(f"SELECT Id FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = '{object_name}' AND Name = '{rule_name}'")
-        if check["totalSize"] == 0:
+        # Must use Tooling API for ValidationRule
+        check_query = f"SELECT Id FROM ValidationRule WHERE EntityDefinition.QualifiedApiName = '{object_name}' AND Name = '{rule_name}'"
+        check = sf.toolingexecute(f"query/?q={check_query}")
+        if check.get("size", 0) == 0:
             return json.dumps(
                 {
                     "success": False,

@@ -98,7 +98,11 @@ def deploy_metadata(
 
     Content format by type:
     - ApexClass: {"body": "public class...", "apiVersion": "59.0"}
-    - CustomField: {"label": "Customer Code", "type": "Text", "length": 50}
+    - ApexTrigger: {"body": "trigger...", "tableName": "Account", "apiVersion": "59.0"}
+    - CustomField (Text): {"label": "Customer Code", "type": "Text", "length": 50}
+    - CustomField (Picklist):
+        Format 1: {"label": "Status", "type": "Picklist", "picklistValues": ["New", "In Progress", "Done"]}
+        Format 2: {"label": "Status", "type": "Picklist", "valueSet": {"valueSetDefinition": {"value": [{"fullName": "New"}, {"fullName": "Done"}]}}}
     - CustomObject: {"label": "My Object", "pluralLabel": "My Objects"}
     - LWC: {"html": "<template>...", "js": "import...", "css": "..."}
 
@@ -231,15 +235,39 @@ def deploy_metadata(
             elif field_type in ["Number", "Currency", "Percent"]:
                 precision = content_dict.get("precision", 18)
                 scale = content_dict.get("scale", 0)
-                type_params = f"precision={precision},scale={scale}"
+                type_params = f"precision={precision};scale={scale}"
             elif field_type == "Picklist":
-                picklist_values = content_dict.get("picklistValues", [])
+                # Support multiple formats for picklist values
+                picklist_values = []
+
+                # Format 1: Simple list ["Value1", "Value2"]
+                if "picklistValues" in content_dict:
+                    picklist_values = content_dict["picklistValues"]
+
+                # Format 2: Metadata API format with valueSet
+                elif "valueSet" in content_dict:
+                    value_set = content_dict["valueSet"]
+                    if "valueSetDefinition" in value_set:
+                        values_list = value_set["valueSetDefinition"].get("value", [])
+                        # Extract fullName from each value object
+                        picklist_values = [v.get("fullName", v.get("label", "")) for v in values_list if isinstance(v, dict)]
+
+                # Format 3: Simple values list
+                elif "values" in content_dict:
+                    picklist_values = content_dict["values"]
+
                 if picklist_values:
-                    type_params = f"values={','.join(picklist_values)}"
+                    # Join with pipe (|) separator as expected by underlying function
+                    type_params = f"values={'|'.join(picklist_values)}"
+
             elif field_type in ["Lookup", "MasterDetail"]:
                 reference_to = content_dict.get("referenceTo", "")
                 relationship_name = content_dict.get("relationshipName", "")
-                type_params = f"referenceTo={reference_to},relationshipName={relationship_name}"
+                relationship_label = content_dict.get("relationshipLabel", relationship_name)
+                type_params = f"referenceTo={reference_to};relationshipName={relationship_name};relationshipLabel={relationship_label}"
+                if field_type == "MasterDetail":
+                    delete_constraint = content_dict.get("deleteConstraint", "Cascade")
+                    type_params += f";deleteConstraint={delete_constraint}"
 
             return dynamic_tools.upsert_custom_field(
                 object_name=object_name,
