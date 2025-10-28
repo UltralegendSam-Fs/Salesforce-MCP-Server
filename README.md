@@ -14,12 +14,14 @@
 
 ## ✨ What is This?
 
-Transform Claude Desktop into a **powerful Salesforce IDE** with 102+ tools for metadata management, testing, multi-org operations, and more. No manual API calls, no context switching - just natural language commands.
+Transform Claude Desktop into a **powerful Salesforce IDE** with 55 optimized tools for metadata management, testing, multi-org operations, and more. No manual API calls, no context switching - just natural language commands.
+
+**NEW v2.0:** Tool consolidation reduces 106 tools → 55 tools (48% reduction) for better LLM performance!
 
 ### Key Features
 
 - 🔐 **One-Click OAuth** - Browser-based authentication for Production, Sandbox, and Custom Domains
-- 🛠️ **102+ Professional Tools** - Complete Salesforce API coverage
+- 🛠️ **55 Optimized Tools** - Complete Salesforce API coverage with LLM-friendly design
 - 🌐 **Multi-Org Management** - Work with multiple orgs simultaneously and compare metadata
 - 📦 **Bulk Operations** - Handle thousands of records with Bulk API 2.0
 - 🧪 **Apex Testing** - Run tests, get coverage, debug with full logs
@@ -120,7 +122,21 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ---
 
-## 🛠️ Tool Categories (102 Total)
+## 🛠️ Tool Categories (55 Total - Optimized for LLMs!)
+
+### ⭐ NEW: Consolidated Tools (Core Operations)
+**Universal tools that replace 59 specialized tools:**
+
+- `deploy_metadata` - Deploy any metadata type (Apex, LWC, Fields, etc.) with single tool
+- `fetch_metadata` - Fetch any metadata type with consistent interface
+- `list_metadata` - List metadata of any type with filtering
+- `bulk_operation` - Unified bulk insert/update/delete operations
+- `export_data` - Export data in CSV, JSON, or backup format
+- `soql_query` - Build and execute queries with optional analysis
+- `get_object_metadata` - Get fields, relationships, and metadata in one call
+- `manage_user_permissions` - Manage profiles and permission sets
+
+**Benefits:** Easier for LLMs to select, more consistent API, flexible parameters
 
 ### 🔐 Authentication & Sessions (6)
 - `salesforce_production_login` - OAuth to production org
