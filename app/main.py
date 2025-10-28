@@ -6,6 +6,12 @@ from app.mcp.server import mcp_server, tool_registry
 
 # IMPORTANT: import tool modules so @register_tool executes.
 # If you add more tool files later, import them here too.
+
+# Consolidated tools (NEW - reduces 106 tools to ~40 tools)
+from app.mcp.tools import consolidated_metadata as _consolidated_metadata  # noqa: F401
+from app.mcp.tools import consolidated_operations as _consolidated_operations  # noqa: F401
+
+# Original tools (still available for backward compatibility)
 from app.mcp.tools import oauth_auth as _oauth_auth  # noqa: F401
 from app.mcp.tools import dynamic_tools as _dynamic_tools  # noqa: F401
 from app.mcp.tools import user_management as _user_management  # noqa: F401
